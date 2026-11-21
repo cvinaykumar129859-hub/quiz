@@ -27,7 +27,7 @@ The API connects to the `quizmaster_db` database. The seed command idempotently 
 
 ## Deploying
 
-For a Render API service, use the repository root as the service root, `npm install && npm run build` as the build command, and `npm --workspace backend run start` as the start command. Set `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, and `FRONTEND_ORIGIN` in the Render environment. Set `FRONTEND_ORIGIN` to the exact Vercel origin, for example `https://quiz-blond-eight-35.vercel.app` (no trailing slash). Multiple allowed origins can be comma-separated.
+For a Render API service, leave the root directory blank, use `npm install && npm run build` as the build command, and `npm start` as the start command. Set `NODE_ENV=production`, `MONGODB_URI`, `JWT_SECRET`, and `FRONTEND_ORIGIN` in the Render environment. Set `FRONTEND_ORIGIN` to the exact Vercel origin, for example `https://quiz-blond-eight-35.vercel.app` (no trailing slash). Multiple allowed origins can be comma-separated.
 
 In Vercel, set `VITE_API_URL` to the Render API URL followed by `/api`. Production auth cookies use `SameSite=None; Secure` so the Vercel frontend can authenticate against the separate Render origin. Use HTTPS for both services.
 
