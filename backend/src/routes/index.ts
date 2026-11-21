@@ -1,0 +1,25 @@
+import { Router } from 'express';
+import { rateLimit } from 'express-rate-limit';
+import { login, logout, me, register } from '../controllers/authController';
+import { categories, listQuizzes, quizDetails, quizQuestions, submitQuiz } from '../controllers/quizController';
+import { myResults, resultById } from '../controllers/resultController';
+import { dashboardStats, profile, updateProfile } from '../controllers/userController';
+import { requireAuth } from '../middleware/auth';
+
+const router = Router();
+const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: true, legacyHeaders: false, message: { message: 'Too many authentication attempts. Try again later.' } });
+router.post('/auth/register', authLimiter, register);
+router.post('/auth/login', authLimiter, login);
+router.post('/auth/logout', logout);
+router.get('/auth/me', requireAuth, me);
+router.get('/quizzes', listQuizzes);
+router.get('/quizzes/categories', categories);
+router.get('/quizzes/:id/questions', requireAuth, quizQuestions);
+router.get('/quizzes/:id', quizDetails);
+router.post('/quizzes/:id/submit', requireAuth, submitQuiz);
+router.get('/results/my-results', requireAuth, myResults);
+router.get('/results/:id', requireAuth, resultById);
+router.get('/users/profile', requireAuth, profile);
+router.put('/users/profile', requireAuth, updateProfile);
+router.get('/users/dashboard-stats', requireAuth, dashboardStats);
+export default router;
