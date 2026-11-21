@@ -5,7 +5,7 @@ import { User } from '../models/User';
 import { AuthRequest } from '../middleware/auth';
 import { loginSchema, registerSchema } from '../validators/schemas';
 
-const cookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax' as const, maxAge: 7 * 24 * 60 * 60 * 1000, path: '/' });
+const cookieOptions = () => ({ httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' as const : 'lax' as const, maxAge: 7 * 24 * 60 * 60 * 1000, path: '/' });
 const publicUser = (user: any) => ({ id: user._id, username: user.username, email: user.email, createdAt: user.createdAt });
 
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -37,4 +37,4 @@ export async function me(req: AuthRequest, res: Response, next: NextFunction): P
   catch (error) { next(error); }
 }
 
-export function logout(_req: Request, res: Response): void { res.clearCookie('quizmaster_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/' }); res.json({ message: 'Logged out' }); }
+export function logout(_req: Request, res: Response): void { res.clearCookie('quizmaster_token', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', path: '/' }); res.json({ message: 'Logged out' }); }

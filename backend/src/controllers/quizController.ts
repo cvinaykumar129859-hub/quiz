@@ -21,14 +21,16 @@ export async function submitQuiz(req: AuthRequest, res: Response, next: NextFunc
     if (!isValidObjectId(req.params.id)) { res.status(404).json({ message: 'Quiz not found' }); return; }
     const quiz = await Quiz.findById(req.params.id);
     if (!quiz) { res.status(404).json({ message: 'Quiz not found' }); return; }
+    const questions = quiz.questions.toObject();
     const answers = input.answers.map(answer => {
-      const question = quiz.questions[answer.questionIndex];
+      const question = questions[answer.questionIndex];
       const isCorrect = answer.selectedAnswer === question.correctAnswer;
       return { questionIndex: answer.questionIndex, selectedAnswer: answer.selectedAnswer, correctAnswer: question.correctAnswer, isCorrect, explanation: question.explanation };
     });
     const score = answers.filter(answer => answer.isCorrect).length;
-    const percentage = Math.round(score / quiz.questions.length * 100);
-    const result = await Result.create({ userId: req.userId, quizId: quiz._id, category: quiz.category, difficulty: quiz.difficulty, score, totalQuestions: quiz.questions.length, percentage, answers });
-    res.status(201).json({ result: { id: result._id, category: quiz.category, difficulty: quiz.difficulty, score, totalQuestions: quiz.questions.length, percentage, passed: percentage >= 60, answers: answers.map((answer, index) => ({ ...answer, question: quiz.questions[index].text, options: quiz.questions[index].options })), completedAt: result.completedAt } });
+    const totalQuestions = questions.length;
+    const percentage = Math.round(score / totalQuestions * 100);
+    const result = await Result.create({ userId: req.userId, quizId: quiz._id, category: quiz.category, difficulty: quiz.difficulty, score, totalQuestions, percentage, answers });
+    res.status(201).json({ result: { id: result._id, category: quiz.category, difficulty: quiz.difficulty, score, totalQuestions, percentage, passed: percentage >= 60, answers: answers.map(answer => ({ ...answer, question: questions[answer.questionIndex].text, options: questions[answer.questionIndex].options })), completedAt: result.completedAt } });
   } catch (error) { next(error); }
 }
